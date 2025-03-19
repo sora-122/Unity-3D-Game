@@ -4,8 +4,15 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
+    public float rotationSpeed = 10f;
+    public float acceleration = 10f;
+    public float deceleration = 10f;
+
+    [Header("Components")]
     public Animator Animator { get; private set; }
+    public Rigidbody rb { get; private set; }
 
     /// <summary>
     /// ステートパターンによるアニメーション管理
@@ -21,9 +28,13 @@ public class PlayerController : MonoBehaviour
     public bool IsMoving { get; set; }
     public bool IsAttacking { get; set; }
 
+    private Vector3 _moveDirection = Vector3.zero;
+    private Vector3 _currentVelocity = Vector3.zero;
+
     private void Awake()
     {
         Animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
 
         // 状態インスタンスの生成
         IdleState = new IdleState();
@@ -53,10 +64,7 @@ public class PlayerController : MonoBehaviour
     {
         // 入力の大きさに応じて移動フラグを設定
         IsMoving = moveDirection.magnitude > 0.1f;
-
-        // シンプルな移動処理（Translate を使用）
-        transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
-        Debug.Log("PlayerController: Moving with direction " + moveDirection);
+        _moveDirection = moveDirection;
     }
 
     private void Update()
@@ -67,11 +75,37 @@ public class PlayerController : MonoBehaviour
         // ※ IsAttacking は外部入力やタイミングで更新する前提です
     }
 
+    private void FixedUpdate()
+    {
+        MoveCharacter();
+    }
+
     // 状態遷移を行うメソッド
     public void TransitionToState(IPlayerState newState)
     {
         CurrentState?.ExitState(this);
         CurrentState = newState;
         CurrentState.EnterState(this);
+    }
+
+    private void MoveCharacter()
+    {
+        if (_moveDirection.magnitude > 0.1f)
+        {
+            // 移動方向へのスムーズな回転
+            Quaternion targetRotation = Quaternion.LookRotation(_moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+
+            // 加速処理
+            _currentVelocity = Vector3.Lerp(_currentVelocity, _moveDirection.normalized * moveSpeed, acceleration * Time.fixedDeltaTime);
+        }
+        else
+        {
+            // 減速処理
+            _currentVelocity = Vector3.Lerp(_currentVelocity, Vector3.zero, deceleration * Time.fixedDeltaTime);
+        }
+
+        // Rigidbody を使った移動
+        rb.linearVelocity = _currentVelocity;
     }
 }
