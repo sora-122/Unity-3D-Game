@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public float deceleration = 10f;
 
     [Header("Attack Settings")]
-    public IWeapon equippedWeapon; // 装備中の武器
+    public WeaponBase equippedWeapon; // 装備中の武器
     public BasicAttack basicAttack; // 基本攻撃
 
 
@@ -62,9 +62,10 @@ public class PlayerController : MonoBehaviour
         if (equippedWeapon == null)
         {
             // デフォルト武器を設定
-            equippedWeapon = ScriptableObject.CreateInstance<Sword>();
-            (equippedWeapon as Sword).damage = 5f;
-            (equippedWeapon as Sword).range = 1.5f;
+            //equippedWeapon = ScriptableObject.CreateInstance<Sword>();
+            //(equippedWeapon as Sword).damage = 5f;
+            //(equippedWeapon as Sword).range = 1.5f;
+            Debug.LogError("No weapon equipped!");
         }
     }
 

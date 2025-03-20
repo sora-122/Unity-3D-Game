@@ -1,27 +1,29 @@
+// AttackState.cs
+// 攻撃状態
+using UnityEngine;
+
 public class AttackState : IPlayerState
 {
     public void EnterState(PlayerController player)
     {
-        player.Animator.Play("Attack");
+        Debug.Log("Enter Attack State");
+        player.Animator.SetBool("IsAttacking", true);
+        player.IsAttacking = true;
     }
 
     public void UpdateState(PlayerController player)
     {
-        if (!player.IsAttacking)
+        // 攻撃アニメーションが終了したら、アイドル状態に戻る
+        if (player.Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
         {
-            if (player.IsMoving)
-            {
-                player.TransitionToState(player.WalkState);
-            }
-            else
-            {
-                player.TransitionToState(player.IdleState);
-            }
+            player.IsAttacking = false;
+            player.TransitionToState(player.IdleState);
         }
     }
 
     public void ExitState(PlayerController player)
     {
-        // 必要に応じて、状態終了時の処理を記述
+        Debug.Log("Exit Attack State");
+        player.Animator.SetBool("IsAttacking", false);
     }
 }

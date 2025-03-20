@@ -1,0 +1,35 @@
+{
+    "items": [
+        {
+            "id": "sword_001",
+            "name": "Iron Sword",
+            "type": "weapon",
+            "grade": 1,
+            "damage": 10,
+            "range": 1.0
+        },
+        {
+            "id": "bow_001",
+            "name": "Wooden Bow",
+            "type": "weapon",
+            "grade": 1,
+            "damage": 8,
+            "range": 5.0
+        },
+        {
+            "id": "sword_002",
+            "name": "Steel Sword",
+            "type": "weapon",
+            "grade": 2,
+            "damage": 15,
+            "range": 1.2
+        },
+        {
+            "id": "armor_001",
+            "name": "Leather Armor",
+            "type": "armor",
+            "grade": 1,
+            "defense": 5
+        }
+    ]
+}

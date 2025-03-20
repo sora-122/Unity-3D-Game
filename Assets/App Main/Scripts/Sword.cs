@@ -7,6 +7,7 @@ public class Sword : WeaponBase
 {
     public float damage = 10f;
     public float range = 1f;
+    public string weaponId;
 
     public override void Use()
     {
