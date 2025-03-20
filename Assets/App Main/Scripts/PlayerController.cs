@@ -10,6 +10,11 @@ public class PlayerController : MonoBehaviour
     public float acceleration = 10f;
     public float deceleration = 10f;
 
+    [Header("Attack Settings")]
+    public IWeapon equippedWeapon; // 装備中の武器
+    public BasicAttack basicAttack; // 基本攻撃
+
+
     [Header("Components")]
     public Animator Animator { get; private set; }
     public Rigidbody rb { get; private set; }
@@ -40,12 +45,27 @@ public class PlayerController : MonoBehaviour
         IdleState = new IdleState();
         WalkState = new WalkState();
         AttackState = new AttackState();
+
+        basicAttack = GetComponent<BasicAttack>();
+        if (basicAttack == null)
+        {
+            basicAttack = gameObject.AddComponent<BasicAttack>();
+        }
     }
 
     private void Start()
     {
         // 初期状態はアイドル
         TransitionToState(IdleState);
+
+        // 初期武器を設定（例：インスペクターから設定）
+        if (equippedWeapon == null)
+        {
+            // デフォルト武器を設定
+            equippedWeapon = ScriptableObject.CreateInstance<Sword>();
+            (equippedWeapon as Sword).damage = 5f;
+            (equippedWeapon as Sword).range = 1.5f;
+        }
     }
 
     private void OnEnable()
@@ -73,6 +93,11 @@ public class PlayerController : MonoBehaviour
         CurrentState?.UpdateState(this);
 
         // ※ IsAttacking は外部入力やタイミングで更新する前提です
+        // 攻撃状態の更新
+        if (IsAttacking)
+        {
+            Attack();
+        }
     }
 
     private void FixedUpdate()
@@ -107,5 +132,23 @@ public class PlayerController : MonoBehaviour
 
         // Rigidbody を使った移動
         rb.linearVelocity = _currentVelocity;
+    }
+
+    // 攻撃処理
+    public void Attack()
+    {
+        // 武器を使用
+        equippedWeapon.Use();
+        // 基本攻撃を実行
+        basicAttack.Attack();
+        // 攻撃アニメーションの再生など
+    }
+
+    // 攻撃ボタン押下時の処理
+    public void OnAttackButtonClicked()
+    {
+        IsAttacking = true;
+        // 攻撃状態に遷移
+        TransitionToState(AttackState);
     }
 }
